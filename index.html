@@ -565,9 +565,6 @@ function render() {
     document.getElementById('kAnkasSub').textContent = ankasOps + ' operaciones';
   })();
 
-  // Top 15 chart — use IMP_ALL/IMP_MES for consistency (no double bars)
-  updateOriginsChart(mesActivo);
-
   if (list.length === 0) {
     cont.innerHTML = '<div class="empty-msg">Sin productos para los filtros seleccionados.</div>';
     return;
@@ -775,6 +772,7 @@ render = function() {
   document.getElementById('kFobKgSub').textContent = 'precio promedio';
 };
 
+updateOriginsChart('all');
 render();
 
 
