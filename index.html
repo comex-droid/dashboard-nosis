@@ -387,14 +387,14 @@ function render() {
 
     const impRowsHtml = importers.map((imp, ii) => {
       const ankFlag = isAnkas(imp.imp);
-      const barW = Math.max(2, Math.round((imp.fob / maxImpFob) * 70));
+      const barW = Math.max(2, Math.round((imp.fob / maxImpFob) * 44));
       const impUnits = [...new Set(imp.embarques.map(e => e.unidad))];
       const impBadges = impUnits.map(u => badgeU(u)).join(' ');
       const embRows = imp.embarques.map(e => {
         return `<div class="emb-row">
           <div>
             <div class="emb-fecha">${e.fecha} · <span class="flag-tag">${e.origen}</span> · ${badgeU(e.unidad)}</div>
-            <div style="margin-top:3px;font-size:10px;color:var(--text-muted)">${fmtCant(e.cantidad, e.unidad)}</div>
+            <div style="margin-top:2px;font-size:10px;color:var(--text-muted)">${fmtCant(e.cantidad, e.unidad)}</div>
           </div>
           <div class="emb-right">
             <div class="emb-fob">${fmtFob(e.fob)}</div>
@@ -403,22 +403,25 @@ function render() {
         </div>`;
       }).join('');
       const uid = 'e_' + pi + '_' + ii;
-      return `<tr class="${ankFlag ? 'ankas-row' : ''}">
-        <td colspan="100">
-          <div class="imp-row-header ${ankFlag ? 'ankas-hdr' : ''}" onclick="toggleImp('${uid}',this)">
+      const impQty = (()=>{const q=calcProductQty([imp]);return fmtQty(q.tnEquiv,q.un);})();
+      return `<div class="imp-row ${ankFlag ? 'ankas-row' : ''}">
+          <div class="imp-row-header" onclick="toggleImp('${uid}',this)">
             <span class="imp-toggle">▼</span>
-            <span class="imp-name ${ankFlag ? 'ankas-name' : ''}">${ankFlag ? '★ ' : ''}${imp.imp}</span>
-            <span>${impBadges}</span>
-            <span class="imp-ops-badge">${imp.embarques.length} desp.</span>
-            <span class="bar-wrap"><span class="bar-fill ${ankFlag ? 'ankas-bar' : ''}" style="width:${barW}px"></span></span>
-            <span style="display:flex;flex-direction:column;align-items:flex-end;gap:1px"><span class="imp-fob-val" style="color:${ankFlag ? 'var(--green-text)' : 'var(--text)'}">${fmtFob(imp.fob)}</span><span class="imp-qty-val">${(()=>{const q=calcProductQty([imp]);return fmtQty(q.tnEquiv,q.un);})()}</span></span>
+            <div style="min-width:0">
+              <div class="imp-name ${ankFlag ? 'ankas-name' : ''}">${ankFlag ? '★ ' : ''}${imp.imp}</div>
+              <div style="display:flex;gap:4px;align-items:center;margin-top:3px;flex-wrap:wrap">
+                ${impBadges}
+                <span class="imp-ops-badge">${imp.embarques.length} desp.</span>
+                <span class="bar-wrap"><span class="bar-fill ${ankFlag ? 'ankas-bar' : ''}" style="width:${barW}px"></span></span>
+              </div>
+            </div>
+            <div class="imp-right">
+              <div class="imp-fob" style="color:${ankFlag ? 'var(--green-text)' : 'var(--text)'}">${fmtFob(imp.fob)}</div>
+              <div class="imp-tn">${impQty}</div>
+            </div>
           </div>
-          <div class="emb-section" id="${uid}">
-            ${embRows}
-            </table>
-          </div>
-        </td>
-      </tr>`;
+          <div class="emb-section" id="${uid}">${embRows}</div>
+        </div>`;
     }).join('');
 
     const block = document.createElement('div');
@@ -427,23 +430,18 @@ function render() {
       <div class="prod-header" onclick="toggleProd(this)">
         <div>
           <div class="prod-name">${hasAnkas ? '★ ' : ''}${prod.nombre}</div>
-          <div class="prod-ncm">NCM ${prod.codigo} · ${importers.length} importadores</div>
+          <div class="prod-ncm">NCM ${prod.codigo} · ${importers.length} import. · ${totalOps} ops.</div>
         </div>
         <div>${badges}</div>
         <div style="text-align:right">
           <div class="prod-fob">${fmtFob(totalFob)}</div>
           <div class="prod-qty">${fmtQty(calcProductQty(importers).tnEquiv, calcProductQty(importers).un)}</div>
         </div>
-        <div class="prod-ops">${totalOps} operaciones</div>
         <div class="chevron">▼</div>
       </div>
       <div class="prod-detail">
-        <table class="imp-table">
-          <thead><tr>
-            <th colspan="100" style="padding:7px 12px;font-size:11px">Importador — hacé clic para ver embarques con país de origen</th>
-          </tr></thead>
-          <tbody>${impRowsHtml}</tbody>
-        </table>
+        <div class="imp-table-hdr">Importador — tocá para ver embarques</div>
+        ${impRowsHtml}
       </div>`;
     cont.appendChild(block);
   });
@@ -502,7 +500,7 @@ function toggleImp(uid, header) {
 const chartMes = new Chart(document.getElementById('chartMes'), {
   type: 'bar',
   data: {
-    labels: ['Enero 2026', 'Febrero 2026', 'Marzo 2026', 'Abril 2026', 'Julio 2026', 'Agosto 2026', 'Sep 2026'],
+    labels: ['Ene 2026', 'Feb 2026', 'Mar 2026', 'Abr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Ago 2026', 'Sep 2026'],
     datasets: [{ label: 'FOB U$S',
       data: [16630960.56, 18010633.02, 18134284.43, 21507610.6, 20331404.34, 22825399.4, 20816128.69, 18051463.86, 23534695.64],
       backgroundColor: '#3266ad', borderRadius: 6, borderSkipped: false }]
